@@ -8,8 +8,17 @@ from preprocessing import DataPreprocessor
 from model import build_multimodal_model
 import os
 
-if not os.path.exists('../output'):
-    os.makedirs('../output')
+# 1. FOOLPROOF PATH SETUP
+# Get the folder where THIS script is located (e.g., .../Project/src)
+script_dir = os.path.dirname(os.path.abspath(__file__))
+# Go one level up to project root, then into 'output' (e.g., .../Project/output)
+output_dir = os.path.join(os.path.dirname(script_dir), 'output')
+
+# Ensure the folder exists
+if not os.path.exists(output_dir):
+    os.makedirs(output_dir)
+
+print(f"📂 Model will be saved to: {output_dir}")
 
 def main():
     # 1. Prepare Data
@@ -50,8 +59,7 @@ def main():
     # 1. Risk Weights: Map class ID to weight for every sample
     risk_sample_weights = np.array([class_weight_dict[y] for y in y_risk_train])
     
-    # 2. Weight Regression Weights: Just use 1.0 (no weighting needed)
-    # We must provide this because Keras expects a list of weights for a list of outputs
+    # 2. Weight Regression Weights: Just use 1.0
     bw_sample_weights = np.ones((len(y_weight_train),))
     
     # 4. Build Quad-Modal Model
@@ -62,40 +70,38 @@ def main():
     
     model = build_multimodal_model(input_shape_clin, input_shape_ctg, input_shape_act, input_shape_img)
     
+    # --- PATH FIX: Define the full path for the model file ---
+    model_save_path = os.path.join(output_dir, 'best_maternal_model.keras')
+
     # 5. Train
     callbacks = [
-        ModelCheckpoint('../output/best_maternal_model.keras', monitor='val_output_risk_accuracy', save_best_only=True, mode='max', verbose=1),
+        # Use the absolute path variable 'model_save_path'
+        ModelCheckpoint(model_save_path, monitor='val_output_risk_accuracy', save_best_only=True, mode='max', verbose=1),
         ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=5, min_lr=0.00001, verbose=1),
         EarlyStopping(monitor='val_loss', patience=15, restore_best_weights=True)
     ]
 
-    print("🚀 Starting Quad-Modal Training (Strategy 1 Applied)...")
+    print(f"🚀 Starting Quad-Modal Training (Saving to {model_save_path})...")
     
     history = model.fit(
-        # Inputs (List of 4)
         x=[X_clin_train, X_ctg_train, X_act_train, X_img_train],
-        
-        # Outputs (List of 2: Risk, Weight)
         y=[y_risk_train, y_weight_train],
-        
         validation_data=(
             [X_clin_test, X_ctg_test, X_act_test, X_img_test], 
             [y_risk_test, y_weight_test]
         ),
         epochs=50,
         batch_size=32,
-        
-        # Sample Weights (List of 2: Risk Weights, Ones)
-        # This tells Keras: "Apply special weights to Output 1, but treat Output 2 normally"
         sample_weight=[risk_sample_weights, bw_sample_weights],
-        
         callbacks=callbacks,
         verbose=1
     )
     
     # 6. Evaluate
     print("\n📊 Evaluating...")
-    model.load_weights('../output/best_maternal_model.keras')
+    # Use the absolute path variable again to load weights
+    model.load_weights(model_save_path)
+    
     results = model.evaluate(
         [X_clin_test, X_ctg_test, X_act_test, X_img_test],
         [y_risk_test, y_weight_test]
