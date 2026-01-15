@@ -36,7 +36,7 @@ def explain_model():
     )
     
     # PATH FIX: Load weights using absolute path
-    model_path = os.path.join(output_dir, 'best_maternal_model.keras')
+    model_path = os.path.join(output_dir, 'best_maternal_model__v4.keras')
     if not os.path.exists(model_path):
         raise FileNotFoundError(f"❌ Model not found at {model_path}. Please run train.py first.")
         

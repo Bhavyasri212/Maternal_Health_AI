@@ -71,7 +71,7 @@ def main():
     model = build_multimodal_model(input_shape_clin, input_shape_ctg, input_shape_act, input_shape_img)
     
     # --- PATH FIX: Define the full path for the model file ---
-    model_save_path = os.path.join(output_dir, 'best_maternal_model.keras')
+    model_save_path = os.path.join(output_dir, 'best_maternal_model__v4.keras')
 
     # 5. Train
     callbacks = [
@@ -90,7 +90,7 @@ def main():
             [X_clin_test, X_ctg_test, X_act_test, X_img_test], 
             [y_risk_test, y_weight_test]
         ),
-        epochs=50,
+        epochs=70,
         batch_size=32,
         sample_weight=[risk_sample_weights, bw_sample_weights],
         callbacks=callbacks,

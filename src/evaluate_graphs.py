@@ -13,7 +13,7 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 
 # We assume 'output' is one level up from 'src'
 output_dir = os.path.join(os.path.dirname(script_dir), 'output')
-model_path = os.path.join(output_dir, 'best_maternal_model.keras')
+model_path = os.path.join(output_dir, 'best_maternal_model__v4.keras')
 
 print("\n" + "="*60)
 print("🔍 DIAGNOSTIC PATH CHECK")
