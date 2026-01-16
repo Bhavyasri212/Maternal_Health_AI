@@ -8,7 +8,7 @@ from model import build_multimodal_model
 # 1. FOOLPROOF PATH SETUP
 script_dir = os.path.dirname(os.path.abspath(__file__))
 output_dir = os.path.join(os.path.dirname(script_dir), 'output')
-model_path = os.path.join(output_dir, 'best_maternal_model.keras')
+model_path = os.path.join(output_dir, 'best_maternal_model__v4.keras')
 
 def run_final_test():
     print("\n" + "="*50)
