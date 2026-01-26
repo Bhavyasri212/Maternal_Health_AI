@@ -337,7 +337,7 @@ def load_system():
         (128, 128, 1)
     )
     BASE_DIR = Path(__file__).resolve().parent.parent
-    MODEL_PATH = BASE_DIR / "output" / "best_maternal_model.keras"
+    MODEL_PATH = BASE_DIR / "output" / "best_maternal_model__v4.keras"
 
     model.load_weights(MODEL_PATH)
 
